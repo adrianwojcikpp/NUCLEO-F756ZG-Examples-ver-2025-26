@@ -102,6 +102,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    HAL_Delay(499);
+    duty = (duty < 100.0f) ? (duty + 10.0f) : (0.0f);
     __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, __DUTY_TO_COMPARE(&htim4, duty));
     /* USER CODE END WHILE */
 
