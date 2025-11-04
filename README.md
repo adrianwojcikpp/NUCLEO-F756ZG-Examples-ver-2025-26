@@ -7,13 +7,13 @@ Projekt stworzony za pomocą środowiska STM32CubeIDE w wersji **1.19.0** oraz f
 Zadania laboratoryjne
 - L00: Wprowadzenie do IDE
   - [Zadanie #1: Szablon projektu](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b92897b852d56b3f91daa9c2fa062c0fea40812e/L00_Example)
-  - [Zadanie #2]()
+  - [Zadanie #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/910317ade96162ec70403fe60b8cc83f8f0ba482/L00_Example)
 - L01: GPIO / NVIC
-  - [Zadanie #1]() 
-  - [Zadanie #2]()
-  - [Zadanie #3]()
-  - [Zadanie #4]()
-  - [Zadanie #5]()
+  - [Zadanie #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/35b15b3e02b33d29aa93c6f3788ff8e3f016c98d/L01_Example) 
+  - [Zadanie #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/0d9dc2fb85a2f28964cb29f0075cadc0ced4951f/L01_Example)
+  - [Zadanie #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/8f0ed9811087921f5ea42ccf192884765137e68e/L01_Example)
+  - [Zadanie #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b83cda0acaba48eb2f5284901071529b9ae73b4d/L01_Example)
+  - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/345e8a0ca6b94d288cbc47b7f8a2c595b6054244/L01_Example)
 - L02: UART
   - [Zadanie #1]() 
   - [Zadanie #2]()
@@ -77,13 +77,13 @@ Project created using the STM32CubeIDE environment, version **1.19.0** and STM32
 
 - L00: Intruduction to IDE
   - [Task #1: Project template](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b92897b852d56b3f91daa9c2fa062c0fea40812e/L00_Example)
-  - [Task #2]()
+  - [Task #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/910317ade96162ec70403fe60b8cc83f8f0ba482/L00_Example)
 - L01: GPIO / NVIC
-  - [Task #1]() 
-  - [Task #2]()
-  - [Task #3]()
-  - [Task #4]()
-  - [Task #5]()
+  - [Task #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/35b15b3e02b33d29aa93c6f3788ff8e3f016c98d/L01_Example) 
+  - [Task #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/0d9dc2fb85a2f28964cb29f0075cadc0ced4951f/L01_Example)
+  - [Task #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/8f0ed9811087921f5ea42ccf192884765137e68e/L01_Example)
+  - [Task #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b83cda0acaba48eb2f5284901071529b9ae73b4d/L01_Example)
+  - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/345e8a0ca6b94d288cbc47b7f8a2c595b6054244/L01_Example)
 - L02: UART
   - [Task #1]() 
   - [Task #2]()
