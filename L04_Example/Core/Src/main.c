@@ -25,9 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdlib.h>
-#include <string.h>
-#include "led_pwm_config.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,8 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char UART_Cmd[] = "XXXXXX";
-unsigned int UART_CmdLen;
+unsigned int ENC_Counter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,20 +57,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/**
-  * @brief  Rx Transfer completed callback.
-  * @param  huart UART handle.
-  * @retval None
-  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  if(huart == &huart3)
-  {
-    unsigned long int LED_RGB_Color_tmp = strtol(UART_Cmd, NULL, 16);
-    LED_RGB_PWM_WriteColor(&hldrgb, LED_RGB_Color_tmp);
-    HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
-  }
-}
+
 /* USER CODE END 0 */
 
 /**
@@ -107,17 +91,17 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART3_UART_Init();
-  MX_TIM4_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  LED_RGB_PWM_Init(&hldrgb);
-  UART_CmdLen = strlen(UART_Cmd);
-  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+  HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    ENC_Counter = __HAL_TIM_GET_COUNTER(&htim3);
+    HAL_Delay(9);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
