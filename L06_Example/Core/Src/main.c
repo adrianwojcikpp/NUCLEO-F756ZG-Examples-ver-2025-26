@@ -20,13 +20,17 @@
 #include "main.h"
 #include "i2c.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "bmp280_config.h"
+#include "heater_pwm_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,6 +54,9 @@
 double Pressure_hPa, Temperature_degC;
 unsigned int Pressure_Pa, Temperature_mdegC;
 unsigned int Delay_ms = 250;
+char UART_Cmd[] = "X000";
+unsigned int UART_CmdLen;
+_Bool UART_SendMeasurement;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -79,6 +86,22 @@ void SystemClock_Config(void);
 int _write(int file, char *ptr, int len)
 {
   return (HAL_UART_Transmit(&huart3, (uint8_t*)ptr, len, HAL_MAX_DELAY) == HAL_OK) ? len : -1;
+}
+
+/**
+  * @brief  Rx Transfer completed callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart == &huart3)
+  {
+    unsigned long int TIM_PWM_DutyCycle_tmp = strtol(&UART_Cmd[1], NULL, 10);
+    if(UART_Cmd[0] == 'D' || UART_Cmd[0] == 'd')
+     HEATER_PWM_WriteDuty(&hheater, (float)TIM_PWM_DutyCycle_tmp);
+    HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+  }
 }
 /* USER CODE END 0 */
 
@@ -114,8 +137,12 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   MX_SPI4_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
   BMP2_Init(&bmp2dev);
+  HEATER_PWM_Init(&hheater);
+  UART_CmdLen = strlen(UART_Cmd);
+  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   /* USER CODE END 2 */
 
   /* Infinite loop */
