@@ -48,7 +48,10 @@
 _Bool LD4_State, LD5_State, LD6_State;   //< External LED states (0 = off, 1 = on)
 _Bool PULL_UP_Btn_State, PULL_UP_Btn_StatePrev = 1; //< External pull-up button
                                                     // state (current and previous)
+_Bool PULL_DOWN_Btn_State, PULL_DOWN_Btn_StatePrev = 0; //< External pull-down button
+                                                    // state (current and previous)
 _Bool PULL_UP_Btn_EdgeDetected = 0;
+_Bool PULL_DOWN_Btn_EdgeDetected = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,15 +112,33 @@ int main(void)
     // Remember state
     PULL_UP_Btn_StatePrev = PULL_UP_Btn_State;
 
-   // If edge detected - perform action (LED toggle)
+    // Read PULL DOWN button
+    PULL_DOWN_Btn_State = HAL_GPIO_ReadPin(PULL_DOWN_Btn_GPIO_Port, PULL_DOWN_Btn_Pin);
+    // Check for rising edge
+    if(PULL_DOWN_Btn_State == 1 && PULL_DOWN_Btn_StatePrev == 0)
+      PULL_DOWN_Btn_EdgeDetected = 1;
+    // Remember state
+    PULL_DOWN_Btn_StatePrev = PULL_DOWN_Btn_State;
+
+   // If edge detected - perform action (LED on or off)
    if(PULL_UP_Btn_EdgeDetected)
    {
      PULL_UP_Btn_EdgeDetected = 0;
-     HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
+     HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_SET);
      LD4_State = HAL_GPIO_ReadPin(LD4_GPIO_Port, LD4_Pin);
-     HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
+     HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, GPIO_PIN_SET);
      LD5_State = HAL_GPIO_ReadPin(LD5_GPIO_Port, LD5_Pin);
-     HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
+     HAL_GPIO_WritePin(LD6_GPIO_Port, LD6_Pin, GPIO_PIN_SET);
+     LD6_State = HAL_GPIO_ReadPin(LD6_GPIO_Port, LD6_Pin);
+   }
+   if(PULL_DOWN_Btn_EdgeDetected)
+   {
+     PULL_DOWN_Btn_EdgeDetected = 0;
+     HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_RESET);
+     LD4_State = HAL_GPIO_ReadPin(LD4_GPIO_Port, LD4_Pin);
+     HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, GPIO_PIN_RESET);
+     LD5_State = HAL_GPIO_ReadPin(LD5_GPIO_Port, LD5_Pin);
+     HAL_GPIO_WritePin(LD6_GPIO_Port, LD6_Pin, GPIO_PIN_RESET);
      LD6_State = HAL_GPIO_ReadPin(LD6_GPIO_Port, LD6_Pin);
    }
 
