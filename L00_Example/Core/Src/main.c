@@ -45,7 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_Bool LD1_State = 0;
+_Bool USER_Btn_State, USER_Btn_StatePrev;
+unsigned int USER_Btn_Counter;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,12 +99,24 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // Toggle green LED state
-    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-    // Read green LED state
-    LD1_State = HAL_GPIO_ReadPin(LD1_GPIO_Port, LD1_Pin);
-    // Wait for 100 milliseconds
-    HAL_Delay(99);
+
+    // Read button state
+    USER_Btn_State = HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin);
+    // Check if current state is High and previous state was Low
+    if(USER_Btn_State == 1 && USER_Btn_StatePrev == 0)
+    {
+      USER_Btn_Counter = (USER_Btn_Counter + 1) % 4; // Increment modulo 4
+    }
+    // Remember button state
+    USER_Btn_StatePrev = USER_Btn_State;
+
+    // Switch LEDs based on button counter
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, USER_Btn_Counter == 1);
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, USER_Btn_Counter == 2);
+    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, USER_Btn_Counter == 3);
+
+    // Wait for 10 milliseconds
+    HAL_Delay(9);
 
     /* USER CODE END WHILE */
 
