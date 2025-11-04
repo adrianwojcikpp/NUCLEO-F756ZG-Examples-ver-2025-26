@@ -24,7 +24,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <string.h>
+#include <stdio.h>
+#include "btn_dio_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,7 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_BitsPerFrame 10 // 1 Start + 8 data bits + 1 Stop
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+unsigned int USER_Btn_Counter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,16 +92,24 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  const char UART_Message[] = "Hello, Nucleo!\r\n";
-  const unsigned int UART_MessageLen = strlen(UART_Message);
-  const unsigned int UART_MessageTimeout_ms = 1 + (1000 * UART_BitsPerFrame * UART_MessageLen / huart3.Init.BaudRate);
-  HAL_UART_Transmit(&huart3, (uint8_t*)UART_Message, UART_MessageLen, UART_MessageTimeout_ms);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    if(BTN_DIO_EdgeDetected(&husrbtn) == BTN_PRESSED_EDGE)
+    {
+      USER_Btn_Counter++;
+      static char UART_Message[64];
+      unsigned int UART_MessageLen = snprintf(UART_Message, sizeof(UART_Message), "Hello %u\n\r", USER_Btn_Counter);
+      unsigned int UART_MessageTimeout = 1 + (1000*10*UART_MessageLen / huart3.Init.BaudRate);
+      HAL_UART_Transmit(&huart3, (uint8_t*)UART_Message, UART_MessageLen, UART_MessageTimeout);
+    }
+
+    HAL_Delay(99);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
