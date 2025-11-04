@@ -33,10 +33,10 @@ Zadania laboratoryjne
   - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d58b57ed2e8f909cdff27273cb3b821daf5f2bbc/L04_Example)
   - [Zadanie #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/994628558b92b8e7937cb77a4905f4e5e5db4b5b/L04_Example)
 - L05: I<sup>2</sup>C
-  - [Zadanie #2 i #3]() 
-  - [Zadanie #4]()
-  - [Zadanie #5]()
-  - [Zadanie #6]()
+  - [Zadanie #2 i #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/60879d4c2cb3a013c09874a7a4c66814bbfcbd9a/L05_Example) 
+  - [Zadanie #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/0cca403b35e18949d9a62c53ce86bff506aae71b/L05_Example)
+  - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/06352b6e9476061e046dddec4c4cc24f1ac7d2fb/L05_Example)
+  - [Zadanie #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/6968a4052e9c220ea69f046e739446f07d2a9e77/L05_Example)
 - L06: SPI
   - [Zadanie #2 i #3]() 
   - [Zadanie #4]()
@@ -103,10 +103,10 @@ Project created using the STM32CubeIDE environment, version **1.19.0** and STM32
   - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d58b57ed2e8f909cdff27273cb3b821daf5f2bbc/L04_Example)
   - [Task #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/994628558b92b8e7937cb77a4905f4e5e5db4b5b/L04_Example)
 - L05: I<sup>2</sup>C
-  - [Task #2 i #3]() 
-  - [Task #4]()
-  - [Task #5]()
-  - [Task #6]()
+  - [Tasks #2 & #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/60879d4c2cb3a013c09874a7a4c66814bbfcbd9a/L05_Example) 
+  - [Task #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/0cca403b35e18949d9a62c53ce86bff506aae71b/L05_Example)
+  - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/06352b6e9476061e046dddec4c4cc24f1ac7d2fb/L05_Example)
+  - [Task #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/6968a4052e9c220ea69f046e739446f07d2a9e77/L05_Example)
 - L06: SPI
   - [Task #2 i #3]() 
   - [Task #4]()
