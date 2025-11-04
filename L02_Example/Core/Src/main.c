@@ -24,8 +24,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "led_dio_config.h"
+#include "jsmn.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,9 +49,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char UART_Cmd[] = "LD00";
-const unsigned int UART_CmdLen = 4;
-_Bool UART_RxComplete;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,18 +59,48 @@ void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
+
 /* USER CODE BEGIN 0 */
 /**
-  * @brief  Rx Transfer completed callback.
-  * @param  huart UART handle.
-  * @retval None
-  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+ * @brief  Low-level implementation of the _write system call.
+ *
+ * This function redirects standard output (e.g., printf) to UART3.
+ * It transmits data from the provided buffer over the UART interface.
+ *
+ * @param[in]  file File descriptor (ignored in this implementation).
+ * @param[in]  ptr  Pointer to the data buffer to be transmitted.
+ * @param[in]  len  Number of bytes to transmit.
+ *
+ * @retval Number of bytes transmitted on success.
+ * @retval -1 on transmission error.
+ *
+ * @note This function is typically used when retargeting printf() to UART.
+ *       It blocks until all bytes are sent (uses HAL_MAX_DELAY).
+ */
+int _write(int file, char *ptr, int len)
 {
-  if(huart == &huart3)
-  {
-    UART_RxComplete = 1;
-  }
+  return (HAL_UART_Transmit(&huart3, (uint8_t*)ptr, len, HAL_MAX_DELAY) == HAL_OK) ? len : -1;
+}
+
+/**
+ * @brief  Low-level implementation of the _read system call.
+ *
+ * This function redirects standard input (e.g., scanf) to UART3.
+ * It receives data into the provided buffer from the UART interface.
+ *
+ * @param[in]  file File descriptor (ignored in this implementation).
+ * @param[out] ptr  Pointer to the data buffer where received bytes will be stored.
+ * @param[in]  len  Maximum number of bytes to read.
+ *
+ * @retval Number of bytes received on success.
+ * @retval -1 on reception error.
+ *
+ * @note This function blocks until the specified number of bytes is received.
+ *       It is typically used when retargeting scanf() to UART.
+ */
+int _read(int file, char *ptr, int len)
+{
+  return (HAL_UART_Receive(&huart3, (uint8_t*)ptr, len, HAL_MAX_DELAY) == HAL_OK) ? len : -1;
 }
 
 /**
@@ -80,48 +111,89 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  * @param[out] state : Pointer to LED_DIO_State_TypeDef
  * @return true if valid format and values, false otherwise
  */
-_Bool UART_ParseCmd(const char *cmd, LED_DIO_Handle_TypeDef **hled, LED_DIO_State_TypeDef *state)
+_Bool UART_ParseCmd(const char *json, LED_DIO_Handle_TypeDef **hled, LED_DIO_State_TypeDef *state)
 {
-    // Basic validation
-    if (cmd == NULL || state == NULL)
-        return 0;
+  if(!json)
+    return 0;
 
-    // Must be exactly 4 characters + null terminator
-    if (strlen(cmd) != 4)
-        return 0;
+  jsmn_parser parser;
+  jsmntok_t tokens[128]; // Adjust size depending on expected input complexity
+  jsmn_init(&parser);
 
-    // Check prefix "LD"
-    if (cmd[0] != 'L' || cmd[1] != 'D')
-        return 0;
+  int token_count = jsmn_parse(&parser, json, strlen(json), tokens, sizeof(tokens)/sizeof(tokens[0]));
+  if(token_count < 1 || tokens[0].type != JSMN_ARRAY)
+    return 0;
 
-    // Check that str[2] is '1', '2', or '3'
-    if (cmd[2] < '1' || cmd[2] > '3')
-        return 0;
+  size_t led_index = 0;
 
-    // Check that str[3] is '0' or '1'
-    if (cmd[3] != '0' && cmd[3] != '1')
-        return 0;
-
-    // Assign LED handle
-    int led = cmd[2] - '0';
-    switch(led)
+  // Iterate over array elements
+  for(int i = 1; i < token_count && led_index < 3; )
+  {
+    if(tokens[i].type != JSMN_OBJECT)
     {
-    case 1:
-      *hled = &hld1;
-      break;
-    case 2:
-      *hled = &hld2;
-      break;
-    case 3:
-      *hled = &hld3;
-      break;
-    default: break;
+      i++;
+      continue;
     }
 
-    // Convert character to integer
-    *state = cmd[3] - '0';
+    int object_size = tokens[i].size * 2; // Each key-value pair = 2 tokens
+    int end = i + object_size + 1;
 
-    return 1;
+    int led_val = -1;
+    _Bool state_val = 0;
+    _Bool led_found = 0, state_found = 0;
+
+    // Process each key-value pair
+    for(int j = i + 1; j < end; j += 2)
+    {
+      jsmntok_t key = tokens[j];
+      jsmntok_t val = tokens[j + 1];
+
+      // Extract key string
+      int key_len = key.end - key.start;
+      const char *key_str = json + key.start;
+
+      if(strncmp(key_str, "id", key_len) == 0 && val.type == JSMN_STRING)
+      {
+        if(strncmp(json + val.start, "LD", 2) == 0)
+        {
+          led_val = atoi(json + val.start + 2);
+          if (led_val >= 1 && led_val <= 3)
+            led_found = 1;
+        }
+      }
+      else if(strncmp(key_str, "state", key_len) == 0 && val.type == JSMN_PRIMITIVE)
+      {
+        if(strncmp(json + val.start, "true", 4) == 0 || atoi(json + val.start) == 1)
+          state_val = 1;
+        else if (strncmp(json + val.start, "false", 5) == 0 || atoi(json + val.start) == 0)
+          state_val = 0;
+        else
+          return 0; // Invalid value
+        state_found = 1;
+      }
+    }
+
+    if(led_found && state_found)
+    {
+      switch(led_val)
+      {
+      case 1:
+        hled[led_index] = &hld1;
+        break;
+      case 2:
+        hled[led_index] = &hld2;
+        break;
+      case 3:
+        hled[led_index] = &hld3;
+        break;
+      default: break;
+      }
+      state[led_index] = state_val;
+      led_index++;
+    }
+    i = end;
+  }
+  return 1;
 }
 
 /* USER CODE END 0 */
@@ -134,7 +206,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  setvbuf(stdin, NULL, _IONBF, 0);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -158,23 +230,24 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+  puts("Hello, Nucleo!");
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(UART_RxComplete)
+    char json_str[128];
+    scanf("%s", json_str);
+    LED_DIO_Handle_TypeDef *hled[3] = { NULL, };
+    LED_DIO_State_TypeDef state[3];
+    if(UART_ParseCmd(json_str, hled, state))
     {
-      UART_RxComplete = 0;
-
-      LED_DIO_Handle_TypeDef* hld;
-      LED_DIO_State_TypeDef LD_State;
-      if(UART_ParseCmd(UART_Cmd, &hld, &LD_State))
-        LED_DIO_Write(hld, LD_State);
-
-      HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+      for(int i = 0; hled[i] != NULL && i < 3; i++)
+      {
+        LED_DIO_Write(hled[i], state[i]);
+        printf("LD%i is %s\n", LED_GET_ID(hled[i]), LED_DIO_Read(hled[i]) ? "On" : "Off" );
+      }
     }
     /* USER CODE END WHILE */
 
