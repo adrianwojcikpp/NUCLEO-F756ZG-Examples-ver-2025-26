@@ -38,10 +38,10 @@ Zadania laboratoryjne
   - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/06352b6e9476061e046dddec4c4cc24f1ac7d2fb/L05_Example)
   - [Zadanie #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/6968a4052e9c220ea69f046e739446f07d2a9e77/L05_Example)
 - L06: SPI
-  - [Zadanie #2 i #3]() 
-  - [Zadanie #4]()
-  - [Zadanie #5]()
-  - [Zadanie #6]()
+  - [Zadanie #2 i #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/43c7052a4092c384d6d87837d21ce19dc2098fe4/L06_Example) 
+  - [Zadanie #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/fe0617373c14737bef39c8aa1d7bda41e0013614/L06_Example)
+  - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/98c01c88fc4e7212f16bf97170ed331e48f07e0f/L06_Example)
+  - [Zadanie #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d5ad6d5a905fea66120c57b6914042ddc492634c/L06_Example)
 - L07: ADC
   - [Zadanie #1]() 
   - [Zadanie #2]()
@@ -108,10 +108,10 @@ Project created using the STM32CubeIDE environment, version **1.19.0** and STM32
   - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/06352b6e9476061e046dddec4c4cc24f1ac7d2fb/L05_Example)
   - [Task #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/6968a4052e9c220ea69f046e739446f07d2a9e77/L05_Example)
 - L06: SPI
-  - [Task #2 i #3]() 
-  - [Task #4]()
-  - [Task #5]()
-  - [Task #6]()
+  - [Tasks #2 & #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/43c7052a4092c384d6d87837d21ce19dc2098fe4/L06_Example) 
+  - [Task #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/fe0617373c14737bef39c8aa1d7bda41e0013614/L06_Example)
+  - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/98c01c88fc4e7212f16bf97170ed331e48f07e0f/L06_Example)
+  - [Task #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d5ad6d5a905fea66120c57b6914042ddc492634c/L06_Example)
 - L07: ADC
   - [Task #1]() 
   - [Task #2]()
