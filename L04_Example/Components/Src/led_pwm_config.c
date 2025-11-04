@@ -21,11 +21,12 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-
-/* Public variables ----------------------------------------------------------*/
 LED_PWM_Handle_TypeDef hldr = LED_PWM_INIT_HANDLE(&htim4, TIM_CHANNEL_1, LED_ON_HIGH);
 LED_PWM_Handle_TypeDef hldg = LED_PWM_INIT_HANDLE(&htim4, TIM_CHANNEL_3, LED_ON_HIGH);
 LED_PWM_Handle_TypeDef hldb = LED_PWM_INIT_HANDLE(&htim4, TIM_CHANNEL_2, LED_ON_HIGH);
+
+/* Public variables ----------------------------------------------------------*/
+LED_RGB_PWM_Handle_TypeDef hldrgb = { .R = &hldr, .G = &hldg, .B = &hldb };
 
 /* Private function prototypes -----------------------------------------------*/
 

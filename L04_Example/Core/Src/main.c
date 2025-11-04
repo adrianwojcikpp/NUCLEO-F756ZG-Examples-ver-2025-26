@@ -48,7 +48,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char UART_Cmd[] = "X000";
+char UART_Cmd[] = "XXXXXX";
 unsigned int UART_CmdLen;
 /* USER CODE END PV */
 
@@ -69,13 +69,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if(huart == &huart3)
   {
-    unsigned long int TIM_PWM_DutyCycle_tmp = strtol(&UART_Cmd[1], NULL, 10);
-    if(UART_Cmd[0] == 'R' || UART_Cmd[0] == 'r')
-      LED_PWM_WriteDuty(&hldr, (float)TIM_PWM_DutyCycle_tmp);
-    else if(UART_Cmd[0] == 'G' || UART_Cmd[0] == 'g')
-      LED_PWM_WriteDuty(&hldg, (float)TIM_PWM_DutyCycle_tmp);
-    else if(UART_Cmd[0] == 'B' || UART_Cmd[0] == 'b')
-      LED_PWM_WriteDuty(&hldb, (float)TIM_PWM_DutyCycle_tmp);
+    unsigned long int LED_RGB_Color_tmp = strtol(UART_Cmd, NULL, 16);
+    LED_RGB_PWM_WriteColor(&hldrgb, LED_RGB_Color_tmp);
     HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   }
 }
@@ -114,9 +109,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  LED_PWM_Init(&hldr);
-  LED_PWM_Init(&hldg);
-  LED_PWM_Init(&hldb);
+  LED_RGB_PWM_Init(&hldrgb);
   UART_CmdLen = strlen(UART_Cmd);
   HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   /* USER CODE END 2 */
