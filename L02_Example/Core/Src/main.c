@@ -46,6 +46,7 @@
 
 /* USER CODE BEGIN PV */
 char UART_RxCharacter = '\0';
+_Bool UART_RxComplete;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,7 +57,18 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/**
+  * @brief  Rx Transfer completed callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart == &huart3)
+  {
+    UART_RxComplete = 1;
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -91,15 +103,19 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_UART_Receive_IT(&huart3, (uint8_t*)&UART_RxCharacter, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(HAL_UART_Receive(&huart3, (uint8_t*)&UART_RxCharacter, 1, 1) == HAL_OK)
+    if(UART_RxComplete)
+    {
+      UART_RxComplete = 0;
       HAL_UART_Transmit(&huart3, (uint8_t*)&UART_RxCharacter, 1, 1);
+      HAL_UART_Receive_IT(&huart3, (uint8_t*)&UART_RxCharacter, 1);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
