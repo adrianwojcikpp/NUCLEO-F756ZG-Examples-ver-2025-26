@@ -57,7 +57,23 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/**
+  * @brief  Period elapsed callback in non-blocking mode
+  * @param  htim TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if(htim == &htim2)
+  {
+    // Toggle global variable
+    DEBUG_Flag1 ^= 1;
 
+    // Toggle and read digital output
+    HAL_GPIO_TogglePin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
+    DEBUG_OUT1_State = HAL_GPIO_ReadPin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -93,24 +109,13 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start(&htim2);
+  HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(__HAL_TIM_GET_FLAG(&htim2, TIM_FLAG_UPDATE))
-    {
-      __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE);
-
-      // Toggle global variable
-      DEBUG_Flag1 ^= 1;
-
-      // Toggle and read digital output
-      HAL_GPIO_TogglePin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
-      DEBUG_OUT1_State = HAL_GPIO_ReadPin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
-    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
