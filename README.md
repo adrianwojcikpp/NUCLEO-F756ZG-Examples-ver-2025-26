@@ -6,7 +6,7 @@ Projekt stworzony za pomocą środowiska STM32CubeIDE w wersji **1.19.0** oraz f
 
 Zadania laboratoryjne
 - L00: Wprowadzenie do IDE
-  - [Zadanie #1: Szablon projektu]()
+  - [Zadanie #1: Szablon projektu](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b92897b852d56b3f91daa9c2fa062c0fea40812e/L00_Example)
   - [Zadanie #2]()
 - L01: GPIO / NVIC
   - [Zadanie #1]() 
@@ -76,7 +76,7 @@ Examples of embedded applications for the NUCLEO development kit with the STM32F
 Project created using the STM32CubeIDE environment, version **1.19.0** and STM32CubeF7 firmware package, version **1.17.4**.
 
 - L00: Intruduction to IDE
-  - [Task #1: Project template]()
+  - [Task #1: Project template](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b92897b852d56b3f91daa9c2fa062c0fea40812e/L00_Example)
   - [Task #2]()
 - L01: GPIO / NVIC
   - [Task #1]() 
