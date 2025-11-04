@@ -22,6 +22,8 @@
 
 /* Public variables ----------------------------------------------------------*/
 extern LED_PWM_Handle_TypeDef hldr; //!< Red channel of RGB THT LED on breadboard
+extern LED_PWM_Handle_TypeDef hldg; //!< Green channel of RGB THT LED on breadboard
+extern LED_PWM_Handle_TypeDef hldb; //!< Blue channel of RGB THT LED on breadboard
 
 /* Public function prototypes ------------------------------------------------*/
 
