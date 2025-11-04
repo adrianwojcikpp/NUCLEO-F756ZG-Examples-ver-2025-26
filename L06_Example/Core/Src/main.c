@@ -56,7 +56,6 @@ unsigned int Pressure_Pa, Temperature_mdegC;
 unsigned int Delay_ms = 250;
 char UART_Cmd[] = "X000";
 unsigned int UART_CmdLen;
-_Bool UART_SendMeasurement;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -138,22 +137,27 @@ int main(void)
   MX_USART3_UART_Init();
   MX_SPI4_Init();
   MX_TIM9_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   BMP2_Init(&bmp2dev);
   HEATER_PWM_Init(&hheater);
   UART_CmdLen = strlen(UART_Cmd);
   HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+  HAL_TIM_Base_Start(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    BMP2_ReadData(&bmp2dev, &Pressure_hPa, &Temperature_degC);
-    Pressure_Pa = 100*Pressure_hPa;
-    Temperature_mdegC = 1000*Temperature_degC;
-    printf("{\"temperature\":%5u.%03d,\"pressure\":%5u.%03d}\r", Temperature_mdegC / 1000, Temperature_mdegC % 1000, Pressure_Pa / 100, Pressure_Pa % 100);
-    HAL_Delay(Delay_ms - 1);
+    if(__HAL_TIM_GET_FLAG(&htim2, TIM_FLAG_UPDATE))
+    {
+      __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE);
+      BMP2_ReadData(&bmp2dev, &Pressure_hPa, &Temperature_degC);
+      Pressure_Pa = 100*Pressure_hPa;
+      Temperature_mdegC = 1000*Temperature_degC;
+      printf("{\"temperature\":%5u.%03d,\"pressure\":%5u.%03d}\r", Temperature_mdegC / 1000, Temperature_mdegC % 1000, Pressure_Pa / 100, Pressure_Pa % 100);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
