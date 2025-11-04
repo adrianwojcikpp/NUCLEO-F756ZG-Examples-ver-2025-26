@@ -25,7 +25,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdlib.h>
+#include <string.h>
+#include "led_pwm_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,14 +42,14 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define __DUTY_TO_COMPARE(htim, duty) ((duty*(__HAL_TIM_GET_AUTORELOAD((htim))+1))/100)
-#define __COMPARE_TO_DUTY(htim, ch)   ((100*__HAL_TIM_GET_COMPARE((htim), (ch)))/(__HAL_TIM_GET_AUTORELOAD((htim))+1))
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float duty;
+char UART_Cmd[] = "X000";
+unsigned int UART_CmdLen;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,7 +60,21 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/**
+  * @brief  Rx Transfer completed callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart == &huart3)
+  {
+    unsigned long int TIM_PWM_DutyCycle_tmp = strtol(&UART_Cmd[1], NULL, 10);
+    if(UART_Cmd[0] == 'R' || UART_Cmd[0] == 'r')
+      LED_PWM_WriteDuty(&hldr, (float)TIM_PWM_DutyCycle_tmp);
+    HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -94,17 +110,15 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  duty = __COMPARE_TO_DUTY(&htim4, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+  LED_PWM_Init(&hldr);
+  UART_CmdLen = strlen(UART_Cmd);
+  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_Delay(499);
-    duty = (duty < 100.0f) ? (duty + 10.0f) : (0.0f);
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, __DUTY_TO_COMPARE(&htim4, duty));
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
