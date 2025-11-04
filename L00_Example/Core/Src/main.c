@@ -45,10 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_Bool LD4_State, LD5_State, LD6_State;   //< External LED states (0 = off, 1 = on)
-_Bool PULL_UP_Btn_State, PULL_UP_Btn_StatePrev = 1; //< External pull-up button
-                                                    // state (current and previous)
-_Bool PULL_UP_Btn_EdgeDetected = 0;
+_Bool USER_Btn_State, USER_Btn_StatePrev;
+unsigned int USER_Btn_Counter;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,28 +99,24 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // Read PULL UP button
-    PULL_UP_Btn_State = HAL_GPIO_ReadPin(PULL_UP_Btn_GPIO_Port, PULL_UP_Btn_Pin);
-    // Check for falling edge
-    if(PULL_UP_Btn_State == 0 && PULL_UP_Btn_StatePrev == 1)
-      PULL_UP_Btn_EdgeDetected = 1;
-    // Remember state
-    PULL_UP_Btn_StatePrev = PULL_UP_Btn_State;
 
-   // If edge detected - perform action (LED toggle)
-   if(PULL_UP_Btn_EdgeDetected)
-   {
-     PULL_UP_Btn_EdgeDetected = 0;
-     HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
-     LD4_State = HAL_GPIO_ReadPin(LD4_GPIO_Port, LD4_Pin);
-     HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
-     LD5_State = HAL_GPIO_ReadPin(LD5_GPIO_Port, LD5_Pin);
-     HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
-     LD6_State = HAL_GPIO_ReadPin(LD6_GPIO_Port, LD6_Pin);
-   }
+    // Read button state
+    USER_Btn_State = HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin);
+    // Check if current state is High and previous state was Low
+    if(USER_Btn_State == 1 && USER_Btn_StatePrev == 0)
+    {
+      USER_Btn_Counter = (USER_Btn_Counter + 1) % 4; // Increment modulo 4
+    }
+    // Remember button state
+    USER_Btn_StatePrev = USER_Btn_State;
 
-   // Wait for 10 milliseconds
-   HAL_Delay(9);
+    // Switch LEDs based on button counter
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, USER_Btn_Counter == 1);
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, USER_Btn_Counter == 2);
+    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, USER_Btn_Counter == 3);
+
+    // Wait for 10 milliseconds
+    HAL_Delay(9);
 
     /* USER CODE END WHILE */
 

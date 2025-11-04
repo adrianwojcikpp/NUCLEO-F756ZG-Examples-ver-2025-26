@@ -45,13 +45,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_Bool LD4_State, LD5_State, LD6_State;   //< External LED states (0 = off, 1 = on)
-_Bool PULL_UP_Btn_State, PULL_UP_Btn_StatePrev = 1; //< External pull-up button
-                                                    // state (current and previous)
-_Bool PULL_DOWN_Btn_State, PULL_DOWN_Btn_StatePrev = 0; //< External pull-down button
-                                                    // state (current and previous)
-_Bool PULL_UP_Btn_EdgeDetected = 0;
-_Bool PULL_DOWN_Btn_EdgeDetected = 0;
+_Bool LD4_State; //< External LED states (0 = off, 1 = on)
+unsigned int ENC_Counter = 0;
+unsigned int LD4_Blink_ms = 100;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,7 +58,45 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == ENC_CLK_Pin || GPIO_Pin == ENC_DT_Pin)
+  {
+    // Read both encoder pins
+    uint8_t clk = HAL_GPIO_ReadPin(ENC_CLK_GPIO_Port, ENC_CLK_Pin);
+    uint8_t dt  = HAL_GPIO_ReadPin(ENC_DT_GPIO_Port, ENC_DT_Pin);
 
+    // Encoder state machine
+    static uint8_t ENC_state, ENC_transition, ENC_prev_state = 0x03;
+    ENC_state = (clk << 1) | dt;
+    ENC_transition = (ENC_prev_state << 2) | ENC_state;
+
+    switch (ENC_transition)
+    {
+        // Clockwise valid transitions
+        case 0x01:  // 00 -> 01
+        case 0x07:  // 01 -> 11
+        case 0x0E:  // 11 -> 10
+        case 0x08:  // 10 -> 00
+            ENC_Counter = (ENC_Counter + 1 + 400) % 400;
+            break;
+
+        // Counter-clockwise valid transitions
+        case 0x02:  // 00 -> 10
+        case 0x04:  // 01 -> 00
+        case 0x0D:  // 11 -> 01
+        case 0x0B:  // 10 -> 11
+            ENC_Counter = (ENC_Counter - 1 + 400) % 400;
+            break;
+
+        default:
+            // Invalid transition — ignore (debounce / noise)
+            break;
+    }
+
+    ENC_prev_state = ENC_state;
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -104,46 +138,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // Read PULL UP button
-    PULL_UP_Btn_State = HAL_GPIO_ReadPin(PULL_UP_Btn_GPIO_Port, PULL_UP_Btn_Pin);
-    // Check for falling edge
-    if(PULL_UP_Btn_State == 0 && PULL_UP_Btn_StatePrev == 1)
-      PULL_UP_Btn_EdgeDetected = 1;
-    // Remember state
-    PULL_UP_Btn_StatePrev = PULL_UP_Btn_State;
+    // Toggle LED
+    HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
+    LD4_State = HAL_GPIO_ReadPin(LD4_GPIO_Port, LD4_Pin);
 
-    // Read PULL DOWN button
-    PULL_DOWN_Btn_State = HAL_GPIO_ReadPin(PULL_DOWN_Btn_GPIO_Port, PULL_DOWN_Btn_Pin);
-    // Check for rising edge
-    if(PULL_DOWN_Btn_State == 1 && PULL_DOWN_Btn_StatePrev == 0)
-      PULL_DOWN_Btn_EdgeDetected = 1;
-    // Remember state
-    PULL_DOWN_Btn_StatePrev = PULL_DOWN_Btn_State;
-
-   // If edge detected - perform action (LED on or off)
-   if(PULL_UP_Btn_EdgeDetected)
-   {
-     PULL_UP_Btn_EdgeDetected = 0;
-     HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_SET);
-     LD4_State = HAL_GPIO_ReadPin(LD4_GPIO_Port, LD4_Pin);
-     HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, GPIO_PIN_SET);
-     LD5_State = HAL_GPIO_ReadPin(LD5_GPIO_Port, LD5_Pin);
-     HAL_GPIO_WritePin(LD6_GPIO_Port, LD6_Pin, GPIO_PIN_SET);
-     LD6_State = HAL_GPIO_ReadPin(LD6_GPIO_Port, LD6_Pin);
-   }
-   if(PULL_DOWN_Btn_EdgeDetected)
-   {
-     PULL_DOWN_Btn_EdgeDetected = 0;
-     HAL_GPIO_WritePin(LD4_GPIO_Port, LD4_Pin, GPIO_PIN_RESET);
-     LD4_State = HAL_GPIO_ReadPin(LD4_GPIO_Port, LD4_Pin);
-     HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, GPIO_PIN_RESET);
-     LD5_State = HAL_GPIO_ReadPin(LD5_GPIO_Port, LD5_Pin);
-     HAL_GPIO_WritePin(LD6_GPIO_Port, LD6_Pin, GPIO_PIN_RESET);
-     LD6_State = HAL_GPIO_ReadPin(LD6_GPIO_Port, LD6_Pin);
-   }
-
-   // Wait for 10 milliseconds
-   HAL_Delay(9);
+    // Wait for given period (100 to 1000 ms)
+    LD4_Blink_ms = 100 + (900 * ENC_Counter / 400);
+    HAL_Delay(LD4_Blink_ms - 1);
 
     /* USER CODE END WHILE */
 

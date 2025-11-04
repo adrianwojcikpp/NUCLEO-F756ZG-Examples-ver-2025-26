@@ -60,6 +60,12 @@ void Error_Handler(void);
 #define USER_Btn_Pin GPIO_PIN_13
 #define USER_Btn_GPIO_Port GPIOC
 #define USER_Btn_EXTI_IRQn EXTI15_10_IRQn
+#define ENC_CLK_Pin GPIO_PIN_3
+#define ENC_CLK_GPIO_Port GPIOF
+#define ENC_CLK_EXTI_IRQn EXTI3_IRQn
+#define ENC_DT_Pin GPIO_PIN_5
+#define ENC_DT_GPIO_Port GPIOF
+#define ENC_DT_EXTI_IRQn EXTI9_5_IRQn
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOH
 #define PULL_UP_Btn_Pin GPIO_PIN_0
