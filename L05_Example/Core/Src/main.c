@@ -52,9 +52,10 @@
 /* USER CODE BEGIN PV */
 float Illuminance_lux = 0.0f;
 unsigned int  Illuminance_mlux = 0;
-unsigned int Delay_ms = 2000;
+unsigned int Delay_ms = 200;
 char UART_Cmd[] = "X000";
 unsigned int UART_CmdLen;
+_Bool UART_SendMeasurement;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,6 +99,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     unsigned long int TIM_PWM_DutyCycle_tmp = strtol(&UART_Cmd[1], NULL, 10);
     if(UART_Cmd[0] == 'D' || UART_Cmd[0] == 'd')
       LED_PWM_WriteDuty(&hld4, (float)TIM_PWM_DutyCycle_tmp);
+    else if(strcmp(UART_Cmd, "READ") == 0)
+      UART_SendMeasurement = 1;
     HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   }
 }
@@ -148,7 +151,11 @@ int main(void)
   {
     Illuminance_lux = BH1750_ReadIlluminance_lux(&hbh1750);
     Illuminance_mlux = 1000 * Illuminance_lux;
-    printf("{\"illuminance\":%5u.%03d}\r", Illuminance_mlux / 1000, Illuminance_mlux % 1000);
+    if(UART_SendMeasurement)
+    {
+      UART_SendMeasurement = 0;
+      printf("{\"illuminance\":%5u.%03d}\r", Illuminance_mlux / 1000, Illuminance_mlux % 1000);
+    }
     HAL_Delay(Delay_ms - 1);
     /* USER CODE END WHILE */
 
