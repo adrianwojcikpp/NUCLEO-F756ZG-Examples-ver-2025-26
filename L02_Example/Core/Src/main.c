@@ -24,7 +24,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
+#include "led_dio_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +46,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-char UART_RxCharacter = '\0';
+char UART_Cmd[] = "LD00";
+const unsigned int UART_CmdLen = 4;
 _Bool UART_RxComplete;
 /* USER CODE END PV */
 
@@ -69,6 +71,59 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     UART_RxComplete = 1;
   }
 }
+
+/**
+ * @brief Read and validate command in the format "LDxy"
+ *
+ * @param[in] str    : Input C-string (must be null-terminated)
+ * @param[out] led   : Double pointer to LED_DIO_Handle_TypeDef
+ * @param[out] state : Pointer to LED_DIO_State_TypeDef
+ * @return true if valid format and values, false otherwise
+ */
+_Bool UART_ParseCmd(const char *cmd, LED_DIO_Handle_TypeDef **hled, LED_DIO_State_TypeDef *state)
+{
+    // Basic validation
+    if (cmd == NULL || state == NULL)
+        return 0;
+
+    // Must be exactly 4 characters + null terminator
+    if (strlen(cmd) != 4)
+        return 0;
+
+    // Check prefix "LD"
+    if (cmd[0] != 'L' || cmd[1] != 'D')
+        return 0;
+
+    // Check that str[2] is '1', '2', or '3'
+    if (cmd[2] < '1' || cmd[2] > '3')
+        return 0;
+
+    // Check that str[3] is '0' or '1'
+    if (cmd[3] != '0' && cmd[3] != '1')
+        return 0;
+
+    // Assign LED handle
+    int led = cmd[2] - '0';
+    switch(led)
+    {
+    case 1:
+      *hled = &hld1;
+      break;
+    case 2:
+      *hled = &hld2;
+      break;
+    case 3:
+      *hled = &hld3;
+      break;
+    default: break;
+    }
+
+    // Convert character to integer
+    *state = cmd[3] - '0';
+
+    return 1;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -103,7 +158,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart3, (uint8_t*)&UART_RxCharacter, 1);
+  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,8 +168,13 @@ int main(void)
     if(UART_RxComplete)
     {
       UART_RxComplete = 0;
-      HAL_UART_Transmit(&huart3, (uint8_t*)&UART_RxCharacter, 1, 1);
-      HAL_UART_Receive_IT(&huart3, (uint8_t*)&UART_RxCharacter, 1);
+
+      LED_DIO_Handle_TypeDef* hld;
+      LED_DIO_State_TypeDef LD_State;
+      if(UART_ParseCmd(UART_Cmd, &hld, &LD_State))
+        LED_DIO_Write(hld, LD_State);
+
+      HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
     }
     /* USER CODE END WHILE */
 
