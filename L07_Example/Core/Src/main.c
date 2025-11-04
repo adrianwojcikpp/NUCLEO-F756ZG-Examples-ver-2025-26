@@ -25,8 +25,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "aio.h"
-#include "led_dio_config.h"
+#include "btn_dio_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +59,26 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/**
+ * @brief  Low-level implementation of the _write system call.
+ *
+ * This function redirects standard output (e.g., printf) to UART3.
+ * It transmits data from the provided buffer over the UART interface.
+ *
+ * @param[in]  file File descriptor (ignored in this implementation).
+ * @param[in]  ptr  Pointer to the data buffer to be transmitted.
+ * @param[in]  len  Number of bytes to transmit.
+ *
+ * @retval Number of bytes transmitted on success.
+ * @retval -1 on transmission error.
+ *
+ * @note This function is typically used when retargeting printf() to UART.
+ *       It blocks until all bytes are sent (uses HAL_MAX_DELAY).
+ */
+int _write(int file, char *ptr, int len)
+{
+  return (HAL_UART_Transmit(&huart3, (uint8_t*)ptr, len, HAL_MAX_DELAY) == HAL_OK) ? len : -1;
+}
 
 /* USER CODE END 0 */
 
@@ -101,12 +122,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_ADC_Start(&hadc1);
-    if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
+    if(BTN_DIO_EdgeDetected(&husrbtn) == BTN_PRESSED_EDGE)
     {
-      POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
-      LED_DIO_Line_WriteValue(POT1_mV / 1000);
+      HAL_ADC_Start(&hadc1);
+      if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
+      {
+        POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
+        printf("{\"id\":\"POT1\",\"voltage\":%4d,\"unit\":\"mV\" }\r\n", (int)POT1_mV);
+      }
     }
+    HAL_Delay(99);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -1,18 +1,18 @@
 /**
   ******************************************************************************
-  * @file		  : led_dio_config.h
+  * @file		: btn_config.h
   * @author  	: AW		Adrian.Wojcik@put.poznan.pl
-  * @version 	: 1.3.2
-   * @date    : Oct 9, 2025
-  * @brief    : Digital output LED components configuration file
+  * @version  : 1.3.1
+  * @date     : Oct 9, 2025
+  * @brief    : Push-button components configuration file
   *
   ******************************************************************************
   */
-#ifndef INC_LED_DIO_CONFIG_H_
-#define INC_LED_DIO_CONFIG_H_
+#ifndef INC_BTN_CONFIG_H_
+#define INC_BTN_CONFIG_H_
 
 /* Public includes -----------------------------------------------------------*/
-#include "led_dio.h"
+#include <btn_dio.h>
 
 /* Public typedef ------------------------------------------------------------*/
 
@@ -21,17 +21,8 @@
 /* Public macro --------------------------------------------------------------*/
 
 /* Public variables ----------------------------------------------------------*/
-extern LED_DIO_Handle_TypeDef hld1;
-extern LED_DIO_Handle_TypeDef hld2;
-extern LED_DIO_Handle_TypeDef hld3;
+extern BTN_DIO_Handle_TypeDef husrbtn; //<! Blue on-board button ("USER")
 
 /* Public function prototypes ------------------------------------------------*/
-/**
- * @brief Writes to LD1-3 as to LED line with 4 values
- *        (LD1 is least significant, LD3 most significant)
- * @param[in] n : Input value: 0, 1, 2 or 3.
- * retval None.
- */
-void LED_DIO_Line_WriteValue(unsigned int n);
 
-#endif /* INC_LED_DIO_CONFIG_H_ */
+#endif /* INC_BTN_CONFIG_H_ */
