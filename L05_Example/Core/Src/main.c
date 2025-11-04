@@ -19,13 +19,17 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "bh1750_config.h"
+#include "led_pwm_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +52,9 @@
 /* USER CODE BEGIN PV */
 float Illuminance_lux = 0.0f;
 unsigned int  Illuminance_mlux = 0;
-unsigned int Delay_ms = 200;
+unsigned int Delay_ms = 2000;
+char UART_Cmd[] = "X000";
+unsigned int UART_CmdLen;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,6 +84,22 @@ void SystemClock_Config(void);
 int _write(int file, char *ptr, int len)
 {
   return (HAL_UART_Transmit(&huart3, (uint8_t*)ptr, len, HAL_MAX_DELAY) == HAL_OK) ? len : -1;
+}
+
+/**
+  * @brief  Rx Transfer completed callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart == &huart3)
+  {
+    unsigned long int TIM_PWM_DutyCycle_tmp = strtol(&UART_Cmd[1], NULL, 10);
+    if(UART_Cmd[0] == 'D' || UART_Cmd[0] == 'd')
+      LED_PWM_WriteDuty(&hld4, (float)TIM_PWM_DutyCycle_tmp);
+    HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+  }
 }
 /* USER CODE END 0 */
 
@@ -112,18 +134,22 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART3_UART_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
   BH1750_Init(&hbh1750);
+  LED_PWM_Init(&hld4);
+  UART_CmdLen = strlen(UART_Cmd);
+  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-  Illuminance_lux = BH1750_ReadIlluminance_lux(&hbh1750);
-  Illuminance_mlux = 1000 * Illuminance_lux;
-  printf("{\"illuminance\":%5u.%03d}\r", Illuminance_mlux / 1000, Illuminance_mlux % 1000);
-  HAL_Delay(Delay_ms - 1);
+    Illuminance_lux = BH1750_ReadIlluminance_lux(&hbh1750);
+    Illuminance_mlux = 1000 * Illuminance_lux;
+    printf("{\"illuminance\":%5u.%03d}\r", Illuminance_mlux / 1000, Illuminance_mlux % 1000);
+    HAL_Delay(Delay_ms - 1);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
