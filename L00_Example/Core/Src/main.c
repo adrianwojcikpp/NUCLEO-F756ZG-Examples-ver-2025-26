@@ -45,8 +45,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_Bool LD1_State;   //< On-board LD1 states (0 = off, 1 = on)
-_Bool USER_Btn_EdgeDetected = 0;
+_Bool LD4_State, LD5_State, LD6_State;   //< External LED states (0 = off, 1 = on)
+_Bool PULL_UP_Btn_State, PULL_UP_Btn_StatePrev = 1; //< External pull-up button
+                                                    // state (current and previous)
+_Bool PULL_UP_Btn_EdgeDetected = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,16 +59,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/**
-  * @brief  EXTI line detection callbacks.
-  * @param  GPIO_Pin Specifies the pins connected EXTI line
-  * @retval None
-  */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  if(GPIO_Pin == USER_Btn_Pin)
-    USER_Btn_EdgeDetected = 1;
-}
+
 /* USER CODE END 0 */
 
 /**
@@ -108,12 +101,24 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // Read PULL UP button
+    PULL_UP_Btn_State = HAL_GPIO_ReadPin(PULL_UP_Btn_GPIO_Port, PULL_UP_Btn_Pin);
+    // Check for falling edge
+    if(PULL_UP_Btn_State == 0 && PULL_UP_Btn_StatePrev == 1)
+      PULL_UP_Btn_EdgeDetected = 1;
+    // Remember state
+    PULL_UP_Btn_StatePrev = PULL_UP_Btn_State;
+
    // If edge detected - perform action (LED toggle)
-   if(USER_Btn_EdgeDetected)
+   if(PULL_UP_Btn_EdgeDetected)
    {
-     USER_Btn_EdgeDetected = 0;
-     HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-     LD1_State = HAL_GPIO_ReadPin(LD1_GPIO_Port, LD1_Pin);
+     PULL_UP_Btn_EdgeDetected = 0;
+     HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
+     LD4_State = HAL_GPIO_ReadPin(LD4_GPIO_Port, LD4_Pin);
+     HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
+     LD5_State = HAL_GPIO_ReadPin(LD5_GPIO_Port, LD5_Pin);
+     HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
+     LD6_State = HAL_GPIO_ReadPin(LD6_GPIO_Port, LD6_Pin);
    }
 
    // Wait for 10 milliseconds
