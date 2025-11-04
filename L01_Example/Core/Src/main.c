@@ -45,8 +45,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_Bool LD1_State, LD2_State, LD3_State; //< On-board LEDs states (0 = off, 1 = on)
-unsigned int LD_Indx = 0;              //< LED index
+_Bool LD1_State;   //< On-board LD1 states (0 = off, 1 = on)
+_Bool USER_Btn_State, USER_Btn_StatePrev = 0; //< On-board pull-down button
+                                              // state (current and previous)
+_Bool USER_Btn_EdgeDetected = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,19 +101,25 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-   // Write to LED pins
-   HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, LD_Indx == 0);
-   LD1_State = HAL_GPIO_ReadPin(LD1_GPIO_Port, LD1_Pin);
-   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, LD_Indx == 1);
-   LD2_State = HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin);
-   HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, LD_Indx == 2);
-   LD3_State = HAL_GPIO_ReadPin(LD3_GPIO_Port, LD3_Pin);
 
-   // Increment LED index modulo 3
-   LD_Indx =  (LD_Indx+1) % 3;
+   // Read USER button
+    USER_Btn_State = HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin);
+   // Check for rising edge
+   if(USER_Btn_State == 1 && USER_Btn_StatePrev == 0)
+     USER_Btn_EdgeDetected = 1;
+   // Remember state
+   USER_Btn_StatePrev = USER_Btn_State;
 
-   // Wait for 100 milliseconds
-   HAL_Delay(99);
+   // If edge detected - perform action (LED toggle)
+   if(USER_Btn_EdgeDetected)
+   {
+     USER_Btn_EdgeDetected = 0;
+     HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+     LD1_State = HAL_GPIO_ReadPin(LD1_GPIO_Port, LD1_Pin);
+   }
+
+   // Wait for 10 milliseconds
+   HAL_Delay(9);
 
     /* USER CODE END WHILE */
 
