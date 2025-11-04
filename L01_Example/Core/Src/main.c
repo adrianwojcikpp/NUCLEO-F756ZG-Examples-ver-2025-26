@@ -46,8 +46,6 @@
 
 /* USER CODE BEGIN PV */
 _Bool LD1_State;   //< On-board LD1 states (0 = off, 1 = on)
-_Bool USER_Btn_State, USER_Btn_StatePrev = 0; //< On-board pull-down button
-                                              // state (current and previous)
 _Bool USER_Btn_EdgeDetected = 0;
 /* USER CODE END PV */
 
@@ -59,7 +57,16 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin Specifies the pins connected EXTI line
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == USER_Btn_Pin)
+    USER_Btn_EdgeDetected = 1;
+}
 /* USER CODE END 0 */
 
 /**
@@ -101,15 +108,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-   // Read USER button
-    USER_Btn_State = HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin);
-   // Check for rising edge
-   if(USER_Btn_State == 1 && USER_Btn_StatePrev == 0)
-     USER_Btn_EdgeDetected = 1;
-   // Remember state
-   USER_Btn_StatePrev = USER_Btn_State;
-
    // If edge detected - perform action (LED toggle)
    if(USER_Btn_EdgeDetected)
    {

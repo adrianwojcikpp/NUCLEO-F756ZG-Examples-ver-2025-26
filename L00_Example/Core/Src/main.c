@@ -45,8 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_Bool USER_Btn_State, USER_Btn_StatePrev;
-unsigned int USER_Btn_Counter;
+_Bool LD1_State;   //< On-board LD1 states (0 = off, 1 = on)
+_Bool USER_Btn_EdgeDetected = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,7 +57,16 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin Specifies the pins connected EXTI line
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == USER_Btn_Pin)
+    USER_Btn_EdgeDetected = 1;
+}
 /* USER CODE END 0 */
 
 /**
@@ -99,24 +108,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+   // If edge detected - perform action (LED toggle)
+   if(USER_Btn_EdgeDetected)
+   {
+     USER_Btn_EdgeDetected = 0;
+     HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+     LD1_State = HAL_GPIO_ReadPin(LD1_GPIO_Port, LD1_Pin);
+   }
 
-    // Read button state
-    USER_Btn_State = HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin);
-    // Check if current state is High and previous state was Low
-    if(USER_Btn_State == 1 && USER_Btn_StatePrev == 0)
-    {
-      USER_Btn_Counter = (USER_Btn_Counter + 1) % 4; // Increment modulo 4
-    }
-    // Remember button state
-    USER_Btn_StatePrev = USER_Btn_State;
-
-    // Switch LEDs based on button counter
-    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, USER_Btn_Counter == 1);
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, USER_Btn_Counter == 2);
-    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, USER_Btn_Counter == 3);
-
-    // Wait for 10 milliseconds
-    HAL_Delay(9);
+   // Wait for 10 milliseconds
+   HAL_Delay(9);
 
     /* USER CODE END WHILE */
 
