@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "aio.h"
+#include "led_dio_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -102,8 +103,10 @@ int main(void)
   {
     HAL_ADC_Start(&hadc1);
     if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
+    {
       POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
-    HAL_Delay(9);
+      LED_DIO_Line_WriteValue(POT1_mV / 1000);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
