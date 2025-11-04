@@ -47,7 +47,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-_Bool DEBUG_OUT1_State, DEBUG_Flag1;
+_Bool DEBUG_OUT1_State, DEBUG_OUT2_State;
+_Bool DEBUG_Flag1, DEBUG_Flag2;
 unsigned int TIM_Period_us;
 char UART_Cmd[] = "0000";
 unsigned int UART_CmdLen;
@@ -70,15 +71,37 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if(htim == &htim2)
   {
-    // Write new period value
-    __HAL_TIM_SET_AUTORELOAD(htim, TIM_Period_us - 1);
+    // Stop delay timer
+    HAL_TIM_Base_Stop_IT(&htim2);
 
-    // Toggle global variable
-    DEBUG_Flag1 ^= 1;
+    // Clear global variable #1
+    DEBUG_Flag1 = 0;
 
-    // Toggle and read digital output
-    HAL_GPIO_TogglePin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
+    // Clear and read digital output #1
+    HAL_GPIO_WritePin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin, GPIO_PIN_RESET);
     DEBUG_OUT1_State = HAL_GPIO_ReadPin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
+
+    // Set global variable #2
+    DEBUG_Flag2 = 1;
+
+    // Set and read digital output #2
+    HAL_GPIO_WritePin(DEBUG_OUT2_GPIO_Port, DEBUG_OUT2_Pin, GPIO_PIN_SET);
+    DEBUG_OUT2_State = HAL_GPIO_ReadPin(DEBUG_OUT2_GPIO_Port, DEBUG_OUT2_Pin);
+
+    // Start pulse timer
+    HAL_TIM_Base_Start_IT(&htim7);
+  }
+  else if(htim == &htim7)
+  {
+    // Stop pulse timer
+    HAL_TIM_Base_Stop_IT(&htim7);
+
+    // Clear global variable #2
+    DEBUG_Flag2 = 0;
+
+    // Clear and read digital output #2
+    HAL_GPIO_WritePin(DEBUG_OUT2_GPIO_Port, DEBUG_OUT2_Pin, GPIO_PIN_RESET);
+    DEBUG_OUT2_State = HAL_GPIO_ReadPin(DEBUG_OUT2_GPIO_Port, DEBUG_OUT2_Pin);
   }
 }
 
@@ -98,6 +121,30 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   }
 }
 
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin Specifies the pins connected EXTI line
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if(GPIO_Pin == USER_Btn_Pin)
+  {
+    // Write new period value
+    __HAL_TIM_SET_AUTORELOAD(&htim2, TIM_Period_us - 1);
+
+    // Set global variable #1
+    DEBUG_Flag1 = 1;
+
+    // Set and read digital output #1
+    HAL_GPIO_WritePin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin, GPIO_PIN_SET);
+    DEBUG_OUT1_State = HAL_GPIO_ReadPin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
+
+    // Start delay timer
+    HAL_TIM_Base_Start_IT(&htim2);
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -106,6 +153,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -131,9 +179,9 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   MX_TIM2_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   TIM_Period_us = __HAL_TIM_GET_AUTORELOAD(&htim2) + 1;
-  HAL_TIM_Base_Start_IT(&htim2);
   UART_CmdLen = strlen(UART_Cmd);
   HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   /* USER CODE END 2 */
