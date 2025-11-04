@@ -25,7 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdlib.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +48,9 @@
 
 /* USER CODE BEGIN PV */
 _Bool DEBUG_OUT1_State, DEBUG_Flag1;
+unsigned int TIM_Period_us;
+char UART_Cmd[] = "0000";
+unsigned int UART_CmdLen;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +70,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if(htim == &htim2)
   {
+    // Write new period value
+    __HAL_TIM_SET_AUTORELOAD(htim, TIM_Period_us - 1);
+
     // Toggle global variable
     DEBUG_Flag1 ^= 1;
 
@@ -74,6 +81,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     DEBUG_OUT1_State = HAL_GPIO_ReadPin(DEBUG_OUT1_GPIO_Port, DEBUG_OUT1_Pin);
   }
 }
+
+/**
+  * @brief  Rx Transfer completed callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart == &huart3)
+  {
+    unsigned long int TIM_Period_us_tmp = strtol(UART_Cmd, NULL, 10);
+    if(TIM_Period_us_tmp >= 100 && TIM_Period_us_tmp <= 100000)
+      TIM_Period_us = TIM_Period_us_tmp;
+    HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -82,7 +106,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -109,7 +132,10 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  TIM_Period_us = __HAL_TIM_GET_AUTORELOAD(&htim2) + 1;
   HAL_TIM_Base_Start_IT(&htim2);
+  UART_CmdLen = strlen(UART_Cmd);
+  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, UART_CmdLen);
   /* USER CODE END 2 */
 
   /* Infinite loop */
