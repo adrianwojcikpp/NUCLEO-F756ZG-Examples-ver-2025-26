@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
-#include "dma.h"
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
@@ -27,6 +26,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "aio.h"
+#include "ntc_config.h"
+#include "ldr_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,8 +48,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float POT1_mV, POT2_mV;
-uint16_t ADC_DMA_Buffer[ADC1_NUMBER_OF_CONV];
+float SENSOR1_mV;
+float SENSOR1_TempSH;
+float SENSOR1_TempBeta;
+float SENSOR1_LightGamma;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,20 +63,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/**
-  * @brief  Regular conversion complete callback in non blocking mode
-  * @param  hadc pointer to a ADC_HandleTypeDef structure that contains
-  *         the configuration information for the specified ADC.
-  * @retval None
-  */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-  if(hadc == &hadc1)
-  {
-    POT1_mV = ADC_REG2VOLTAGE(ADC_DMA_Buffer[0]);
-    POT2_mV = ADC_REG2VOLTAGE(ADC_DMA_Buffer[1]);
-  }
-}
+
 /* USER CODE END 0 */
 
 /**
@@ -104,7 +95,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   MX_ADC1_Init();
@@ -116,7 +106,18 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADC_DMA_Buffer, ADC1_NUMBER_OF_CONV);
+    HAL_ADC_Start(&hadc1);
+    if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
+    {
+      SENSOR1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
+
+      // If NTC
+      SENSOR1_TempSH = NTC_SteinhartHart_ReadTemperature_degC(&hntc1_sh, SENSOR1_mV);
+      SENSOR1_TempBeta = NTC_Beta_ReadTemperature_degC(&hntc1_beta, SENSOR1_mV);
+
+      // If LDR
+      SENSOR1_LightGamma = LDR_Gamma_ReadIlluminance_lx(&hldr1_gamma, SENSOR1_mV);
+    }
     HAL_Delay(9);
     /* USER CODE END WHILE */
 
