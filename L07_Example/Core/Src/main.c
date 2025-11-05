@@ -25,9 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
 #include "aio.h"
-#include "btn_dio_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float POT1_mV;
+float POT1_mV, POT2_mV;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,26 +57,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/**
- * @brief  Low-level implementation of the _write system call.
- *
- * This function redirects standard output (e.g., printf) to UART3.
- * It transmits data from the provided buffer over the UART interface.
- *
- * @param[in]  file File descriptor (ignored in this implementation).
- * @param[in]  ptr  Pointer to the data buffer to be transmitted.
- * @param[in]  len  Number of bytes to transmit.
- *
- * @retval Number of bytes transmitted on success.
- * @retval -1 on transmission error.
- *
- * @note This function is typically used when retargeting printf() to UART.
- *       It blocks until all bytes are sent (uses HAL_MAX_DELAY).
- */
-int _write(int file, char *ptr, int len)
-{
-  return (HAL_UART_Transmit(&huart3, (uint8_t*)ptr, len, HAL_MAX_DELAY) == HAL_OK) ? len : -1;
-}
 
 /* USER CODE END 0 */
 
@@ -122,16 +100,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(BTN_DIO_EdgeDetected(&husrbtn) == BTN_PRESSED_EDGE)
-    {
-      HAL_ADC_Start(&hadc1);
-      if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
-      {
-        POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
-        printf("{\"id\":\"POT1\",\"voltage\":%4d,\"unit\":\"mV\" }\r\n", (int)POT1_mV);
-      }
-    }
-    HAL_Delay(99);
+    HAL_ADC_Start(&hadc1);
+    if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
+      POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
+
+    HAL_ADC_Start(&hadc1);
+    if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
+      POT2_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
+
+    HAL_Delay(9);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
