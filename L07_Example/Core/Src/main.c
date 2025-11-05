@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
@@ -47,6 +48,7 @@
 
 /* USER CODE BEGIN PV */
 float POT1_mV, POT2_mV;
+uint16_t ADC_DMA_Buffer[ADC1_NUMBER_OF_CONV];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,13 +69,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
   if(hadc == &hadc1)
   {
-    if(hadc1.NbrOfCurrentConversionRank == 1)
-      POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
-
-    else if(hadc1.NbrOfCurrentConversionRank == 2)
-      POT2_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
-
-    hadc1.NbrOfCurrentConversionRank = 1 + (hadc1.NbrOfCurrentConversionRank % ADC1_NUMBER_OF_CONV);
+    POT1_mV = ADC_REG2VOLTAGE(ADC_DMA_Buffer[0]);
+    POT2_mV = ADC_REG2VOLTAGE(ADC_DMA_Buffer[1]);
   }
 }
 /* USER CODE END 0 */
@@ -107,18 +104,19 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  hadc1.NbrOfCurrentConversionRank = 1;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_ADC_Start_IT(&hadc1);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)ADC_DMA_Buffer, ADC1_NUMBER_OF_CONV);
     HAL_Delay(9);
     /* USER CODE END WHILE */
 
