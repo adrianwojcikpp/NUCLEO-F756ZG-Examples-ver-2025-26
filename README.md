@@ -43,11 +43,11 @@ Zadania laboratoryjne
   - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/98c01c88fc4e7212f16bf97170ed331e48f07e0f/L06_Example)
   - [Zadanie #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d5ad6d5a905fea66120c57b6914042ddc492634c/L06_Example)
 - L07: ADC
-  - [Zadanie #1]() 
-  - [Zadanie #2]()
-  - [Zadanie #3]()
-  - [Zadanie #4 (ver. A)]() / [(ver. B)]() / [(ver. B)]()
-  - [Zadanie #5]()
+  - [Zadanie #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d5b27694adbd8e6cd345597011964aaa1f40283f/L07_Example) 
+  - [Zadanie #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b800a3cd6a2eadfa1d154ef5cbbd3d8dfde5d238/L07_Example)
+  - [Zadanie #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/78b320ba9883d2570b584ec87aaf65003f887b76/L07_Example)
+  - [Zadanie #4 (ver. A)](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/f4110d21879ab119e964e1097f432e0704e89a57/L07_Example) / [(ver. B)](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/feb3037be658602b185e470408fde51aa8557fcf/L07_Example) / [(ver. C)](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/2ddb95b7c28df59597329d686b173b5d666c92f6/L07_Example)
+  - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/89f06f89faae378a9ec17600016a84a2d73eacd5/L07_Example)
 - L08: DAC
   - [Zadanie #1]() 
   - [Zadanie #2]()
@@ -113,11 +113,11 @@ Project created using the STM32CubeIDE environment, version **1.19.0** and STM32
   - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/98c01c88fc4e7212f16bf97170ed331e48f07e0f/L06_Example)
   - [Task #6](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d5ad6d5a905fea66120c57b6914042ddc492634c/L06_Example)
 - L07: ADC
-  - [Task #1]() 
-  - [Task #2]()
-  - [Task #3]()
-  - [Task #4 (ver. A)]() / [(ver. B)]() / [(ver. B)]()
-  - [Task #5]()
+  - [Task #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/d5b27694adbd8e6cd345597011964aaa1f40283f/L07_Example) 
+  - [Task #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/b800a3cd6a2eadfa1d154ef5cbbd3d8dfde5d238/L07_Example)
+  - [Task #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/78b320ba9883d2570b584ec87aaf65003f887b76/L07_Example)
+  - [Task #4 (ver. A)](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/f4110d21879ab119e964e1097f432e0704e89a57/L07_Example) / [(ver. B)](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/feb3037be658602b185e470408fde51aa8557fcf/L07_Example) / [(ver. C)](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/2ddb95b7c28df59597329d686b173b5d666c92f6/L07_Example)
+  - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/89f06f89faae378a9ec17600016a84a2d73eacd5/L07_Example)
 - L08: DAC
   - [Task #1]() 
   - [Task #2]()
