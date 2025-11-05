@@ -57,7 +57,25 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/**
+  * @brief  Regular conversion complete callback in non blocking mode
+  * @param  hadc pointer to a ADC_HandleTypeDef structure that contains
+  *         the configuration information for the specified ADC.
+  * @retval None
+  */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+  if(hadc == &hadc1)
+  {
+    if(hadc1.NbrOfCurrentConversionRank == 1)
+      POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
 
+    else if(hadc1.NbrOfCurrentConversionRank == 2)
+      POT2_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
+
+    hadc1.NbrOfCurrentConversionRank = 1 + (hadc1.NbrOfCurrentConversionRank % ADC1_NUMBER_OF_CONV);
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -93,21 +111,14 @@ int main(void)
   MX_USART3_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-
+  hadc1.NbrOfCurrentConversionRank = 1;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_ADC_Start(&hadc1);
-    if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
-      POT1_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
-
-    HAL_ADC_Start(&hadc1);
-    if(HAL_ADC_PollForConversion(&hadc1, ADC1_TIMEOUT) == HAL_OK)
-      POT2_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(&hadc1));
-
+    HAL_ADC_Start_IT(&hadc1);
     HAL_Delay(9);
     /* USER CODE END WHILE */
 
