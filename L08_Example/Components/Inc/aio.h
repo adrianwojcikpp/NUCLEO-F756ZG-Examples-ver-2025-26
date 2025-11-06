@@ -99,4 +99,11 @@ float VOLTAGE_DIVIDER_Read_R_DOWM(VOLTAGE_DIVIDER_Handle_TypeDef* hvd, float vol
  */
 float VOLTAGE_DIVIDER_Read_R_UP(VOLTAGE_DIVIDER_Handle_TypeDef* hvd, float voltage);
 
+/**
+ * @brief Writes to DAC data holding register (Channel #1, 12 bits, right alignment).
+ * @param[in] voltage : Voltage expressed in millivolts, in range <0 - 3300> mV
+ * @retval None
+ */
+void DAC_SetVoltage_mV(float voltage_mv);
+
 #endif /* INC_AIO_H_ */

@@ -20,6 +20,7 @@
 #include "main.h"
 #include "dac.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -30,7 +31,16 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+/**
+ * @brief  Harmonic signal parameters
+ */
+typedef struct {
+  float Amplitude;  /* mV  */
+  float Phase;      /* rad */
+  float Mean;       /* Hz  */
+  float Frequency;  /* mV  */
+  float SampleTime; /* s   */
+} SINE_WAVE_Handle_TypeDef;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -46,7 +56,15 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float VOUT_mV = 500.0f;
+float VOUT_mV = 0.0f;
+unsigned long int Time_ms = 0;
+const SINE_WAVE_Handle_TypeDef hsine = {
+    .Amplitude = 1000,  /* mV  */
+    .Phase = 0*M_PI,    /* rad */
+    .Frequency = 10,    /* Hz  */
+    .Mean = 1000,       /* mV  */
+    .SampleTime = 0.001 /* s   */
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,14 +76,16 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /**
- * @brief Writes to DAC data holding register (Channel #1, 12 bits, right alignment).
- * @param[in] voltage : Voltage expressed in millivolts, in range <0 - 3300> mV
- * @retval None
+ * @brief Computes value of given sine wave at given discrete time.
+ * @param[in] sine_wave     : Structure with sine wave parameters.
+ * @param[in] discrete_time : Discrete time (sample number).
+ * @retval Sine wave value at discrete time.
  */
-void DAC_SetVoltage_mV(float voltage_mv)
+float SINE_WAVE_GetValue(const SINE_WAVE_Handle_TypeDef* sine_wave, unsigned int discrete_time)
 {
-  // TODO
-
+  float time = sine_wave->SampleTime*discrete_time;
+  float value = (sine_wave->Amplitude)*sinf(2.0f*M_PI*sine_wave->Frequency*time + sine_wave->Phase) + sine_wave->Mean;
+  return value;
 }
 /* USER CODE END 0 */
 
@@ -101,15 +121,24 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   MX_DAC_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
-  DAC_SetVoltage_mV(VOUT_mV);
+  HAL_TIM_Base_Start(&htim7);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    if(__HAL_TIM_GET_FLAG(&htim7, TIM_FLAG_UPDATE))
+    {
+      __HAL_TIM_CLEAR_FLAG(&htim7, TIM_FLAG_UPDATE);
+
+      VOUT_mV = SINE_WAVE_GetValue(&hsine, Time_ms);
+      DAC_SetVoltage_mV(VOUT_mV);
+      Time_ms++;
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
