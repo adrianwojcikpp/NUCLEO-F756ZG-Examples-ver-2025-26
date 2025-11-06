@@ -31,7 +31,8 @@
 
 /* Private function prototypes -----------------------------------------------*/
 //CuSuite* CuGet_Test_CMSIS_DSP_RMSE_Suite(void);
-CuSuite* CuGet_TestCmsisDsp_MAT_MULT_Suite(void);
+//CuSuite* CuGet_Test_CMSIS_MULT_Suite(void);
+CuSuite* CuGet_Test_CMSIS_DSP_FIR_Suite(void);
 
 /* Public function prototypes ------------------------------------------------*/
 
@@ -44,7 +45,8 @@ int RunAllTests(void)
 	CuSuite* suite = CuSuiteNew();
 
 	//CuSuiteAddSuite(suite, CuGet_Test_CMSIS_DSP_RMSE_Suite());
-	CuSuiteAddSuite(suite, CuGet_TestCmsisDsp_MAT_MULT_Suite());
+	//CuSuiteAddSuite(suite, CuGet_TestCmsisDsp_MAT_MULT_Suite());
+	CuSuiteAddSuite(suite, CuGet_Test_CMSIS_DSP_FIR_Suite());
 
 	CuSuiteRun(suite);
 	CuSuiteSummary(suite, output);

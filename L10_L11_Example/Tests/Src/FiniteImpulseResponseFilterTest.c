@@ -1,16 +1,16 @@
 /**
   ******************************************************************************
-  * @file     : MarixtMultiplicationTest.c
+  * @file     : FiniteImpulseResponseFilterTest.c.c
   * @author   : AW    Adrian.Wojcik@put.poznan.pl
   * @version  : 1.0.0
   * @date     : Nov 6, 2025
-  * @brief    : Unit test for CMSIS DSP matrix multiplication function.
+  * @brief    : Unit test for CMSIS DSP FIR filter function.
   *
-  *             This file defines and verifies matrix multiplication computation
-  *             based onCMSIS DSP library routines. The test uses the CuTest
+  *             This file defines and verifies FIR filter computation based on
+  *             CMSIS DSP library routines. The test uses the CuTest
   *             framework for validation.
   *
-  * @see      : https://arm-software.github.io/CMSIS-DSP/main/group__MatrixMult.html
+  * @see      : https://arm-software.github.io/CMSIS-DSP/latest/group__FIR.html
   *
   ******************************************************************************
   */
@@ -22,18 +22,22 @@
 #include "CuTest.h"
 #include "arm_math.h"
 
-#include "A_mat.h"
-#include "B_mat.h"
-#include "C_mat.h"
-#include "C_REF_mat.h"
+#include "FIR1_fir.h"
+#include "X1_vec.h"
+#include "Y1_vec.h"
+#include "Y1_REF_vec.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
+#define USE_SWV_FIR 0
 
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+#if USE_SWV_FIR
+float32_t SWV_FIR1;
+#endif
 
 /* Public variables ----------------------------------------------------------*/
 
@@ -51,26 +55,30 @@ float32_t RMSE(const float32_t* y, const float32_t* yref, const uint32_t len);
 
 /* Private functions ---------------------------------------------------------*/
 
-void TestCmsisDsp_MAT_MULT(CuTest *tc)
+void Test_CMSIS_DSP_FIR(CuTest *tc)
 {
-  // Initialize matrix instances
-  arm_mat_init_f32(&A, A_ROWS, A_COLS, A_DATA);
-  arm_mat_init_f32(&B, B_ROWS, B_COLS, B_DATA);
-  arm_mat_init_f32(&C, C_ROWS, C_COLS, C_DATA);
+  // Initialize FIR filter instance
+  arm_fir_init_f32(&FIR1, FIR1_NUM_TAPS, FIR1_COEFFS, FIR1_STATE, FIR1_BLOCK_SIZE);
 
-  arm_status status = arm_mat_mult_f32(&A, &B, &C);
+  // Filter test signal sample by sample
+  for(uint32_t i = 0; i < X1_LEN; i++)
+  {
+    arm_fir_f32(&FIR1, &X1[i], &Y1[i], FIR1_BLOCK_SIZE);
+    #if USE_SWV_FIR
+    SWV_FIR1 = Y1[i];
+    HAL_Delay(0);
+    #endif
+  }
 
-  CuAssertIntEquals(tc, ARM_MATH_SUCCESS, status);
+  float32_t rmse = RMSE(Y1_REF, Y1, Y1_LEN);
 
-  float32_t rmse = RMSE((float32_t*)C_REF_DATA, C.pData, C_ROWS*C_COLS);
-
-  CuAssertDblEquals(tc, 0.0f, rmse, 1e-7f);
+  CuAssertDblEquals(tc, 0.0f, rmse, 1e-6f);
 }
 
 /* Public functions ----------------------------------------------------------*/
-CuSuite* CuGet_TestCmsisDsp_MAT_MULT_Suite(void)
+CuSuite* CuGet_Test_CMSIS_DSP_FIR_Suite(void)
 {
   CuSuite* suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, TestCmsisDsp_MAT_MULT);
+  SUITE_ADD_TEST(suite, Test_CMSIS_DSP_FIR);
   return suite;
 }
