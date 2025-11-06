@@ -27,7 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sine_wave_dma_buffer.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,18 +37,23 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define DAC_DMA_DATA_SIZE    (sizeof(rawData))
+#define DAC_DMA_BLOCK_SIZE   0xffff
 
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define DAC_DMA_LEN(indx)    ((DAC_DMA_DATA_SIZE-(indx)>DAC_DMA_BLOCK_SIZE)?\
+                             DAC_DMA_BLOCK_SIZE:(DAC_DMA_DATA_SIZE-(indx)))
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern unsigned char rawData[163148];
+_Bool DAC_DMA_ConvCplt = 0;
+uint32_t DAC_DMA_Index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,6 +64,17 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/**
+  * @brief  Conversion complete callback in non-blocking mode for Channel1
+  * @param  hdac pointer to a DAC_HandleTypeDef structure that contains
+  *         the configuration information for the specified DAC.
+  * @retval None
+  *
+  */
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac)
+{
+  DAC_DMA_ConvCplt = 1;
+}
 
 /* USER CODE END 0 */
 
@@ -97,7 +113,7 @@ int main(void)
   MX_DAC_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
-  HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*)sine_wave_dma_buffer, SINE_WAVE_DMA_BUFFER_SIZE, DAC_ALIGN_12B_R);
+  HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*)&rawData[DAC_DMA_Index], DAC_DMA_LEN(DAC_DMA_Index), DAC_ALIGN_8B_R);
   HAL_TIM_Base_Start(&htim7);
   /* USER CODE END 2 */
 
@@ -105,6 +121,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    if(DAC_DMA_ConvCplt)
+    {
+      DAC_DMA_ConvCplt = 0;
+      DAC_DMA_Index += DAC_DMA_BLOCK_SIZE;
+      if(DAC_DMA_Index < DAC_DMA_DATA_SIZE)
+        HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*)&rawData[DAC_DMA_Index], DAC_DMA_LEN(DAC_DMA_Index), DAC_ALIGN_8B_R);
+      else
+        HAL_DAC_Stop_DMA(&hdac, DAC_CHANNEL_1);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
