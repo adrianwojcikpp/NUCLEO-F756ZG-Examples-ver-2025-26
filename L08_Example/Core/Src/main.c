@@ -26,23 +26,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include <string.h>
-#include "aio.h"
+#include "sine_wave_dma_buffer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-/**
- * @brief  Harmonic signal parameters
- */
-typedef struct {
-  float Amplitude;  /* mV  */
-  float Phase;      /* rad */
-  float Mean;       /* Hz  */
-  float Frequency;  /* mV  */
-  float SampleTime; /* s   */
-} SINE_WAVE_Handle_TypeDef;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -58,16 +47,7 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float VOUT_mV = 0.0f;
-unsigned long int Time_ms = 0;
-SINE_WAVE_Handle_TypeDef hsine = {
-    .Amplitude = 1000,  /* mV  */
-    .Phase = 0*M_PI,    /* rad */
-    .Frequency = 10,    /* Hz  */
-    .Mean = 1000,       /* mV  */
-    .SampleTime = 0.001 /* s   */
-};
-char UART_Cmd[] = "X0000";
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,53 +58,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/**
- * @brief Computes value of given sine wave at given discrete time.
- * @param[in] sine_wave     : Structure with sine wave parameters.
- * @param[in] discrete_time : Discrete time (sample number).
- * @retval Sine wave value at discrete time.
- */
-float SINE_WAVE_GetValue(const SINE_WAVE_Handle_TypeDef* sine_wave, unsigned int discrete_time)
-{
-  float time = sine_wave->SampleTime*discrete_time;
-  float value = (sine_wave->Amplitude)*sinf(2.0f*M_PI*sine_wave->Frequency*time + sine_wave->Phase) + sine_wave->Mean;
-  return value;
-}
 
-/**
-  * @brief  Rx Transfer completed callback.
-  * @param  huart UART handle.
-  * @retval None
-  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  if(huart == &huart3)
-  {
-    char param = '\0';
-    int value;
-    if(sscanf((char*)UART_Cmd, "%c%d", &param, &value) == 2)
-    {
-      switch(param)
-      {
-      case 'A':
-      case 'a':
-        hsine.Amplitude = __SATURATION(value, 0, DAC_VOLTAGE_MAX/2);
-        break;
-      case 'm':
-      case 'M':
-        hsine.Mean = __SATURATION(value, 0, DAC_VOLTAGE_MAX);
-        break;
-      case 'f':
-      case 'F':
-        hsine.Frequency = __SATURATION(value, 1, 100);
-        break;
-      default:
-        break;
-      }
-    }
-    HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, strlen(UART_Cmd));
-  }
-}
 /* USER CODE END 0 */
 
 /**
@@ -163,7 +97,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
   HAL_TIM_Base_Start(&htim7);
-  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, strlen(UART_Cmd));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -174,9 +107,9 @@ int main(void)
     {
       __HAL_TIM_CLEAR_FLAG(&htim7, TIM_FLAG_UPDATE);
 
-      VOUT_mV = SINE_WAVE_GetValue(&hsine, Time_ms);
-      DAC_SetVoltage_mV(VOUT_mV);
-      Time_ms++;
+      static int i = 0;
+      HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, sine_wave_dma_buffer[i]);
+      i = (i < SINE_WAVE_DMA_BUFFER_SIZE - 1) ? (i + 1) : 0;
     }
     /* USER CODE END WHILE */
 
