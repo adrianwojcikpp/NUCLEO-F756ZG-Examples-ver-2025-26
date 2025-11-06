@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dac.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -90,12 +91,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   MX_DAC_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
-  HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
+  HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*)sine_wave_dma_buffer, SINE_WAVE_DMA_BUFFER_SIZE, DAC_ALIGN_12B_R);
   HAL_TIM_Base_Start(&htim7);
   /* USER CODE END 2 */
 
@@ -103,14 +105,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(__HAL_TIM_GET_FLAG(&htim7, TIM_FLAG_UPDATE))
-    {
-      __HAL_TIM_CLEAR_FLAG(&htim7, TIM_FLAG_UPDATE);
-
-      static int i = 0;
-      HAL_DAC_SetValue(&hdac, DAC_CHANNEL_1, DAC_ALIGN_12B_R, sine_wave_dma_buffer[i]);
-      i = (i < SINE_WAVE_DMA_BUFFER_SIZE - 1) ? (i + 1) : 0;
-    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
