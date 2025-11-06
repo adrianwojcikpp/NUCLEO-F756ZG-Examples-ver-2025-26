@@ -65,4 +65,5 @@ float VOLTAGE_DIVIDER_Read_R_UP(VOLTAGE_DIVIDER_Handle_TypeDef* hvd, float volta
 void DAC_SetVoltage_mV(float voltage_mv)
 {
   // TODO
+
 }

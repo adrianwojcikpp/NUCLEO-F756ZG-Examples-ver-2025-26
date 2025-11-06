@@ -26,6 +26,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <string.h>
 #include "aio.h"
 /* USER CODE END Includes */
 
@@ -58,13 +60,14 @@ typedef struct {
 /* USER CODE BEGIN PV */
 float VOUT_mV = 0.0f;
 unsigned long int Time_ms = 0;
-const SINE_WAVE_Handle_TypeDef hsine = {
+SINE_WAVE_Handle_TypeDef hsine = {
     .Amplitude = 1000,  /* mV  */
     .Phase = 0*M_PI,    /* rad */
     .Frequency = 10,    /* Hz  */
     .Mean = 1000,       /* mV  */
     .SampleTime = 0.001 /* s   */
 };
+char UART_Cmd[] = "X0000";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -86,6 +89,41 @@ float SINE_WAVE_GetValue(const SINE_WAVE_Handle_TypeDef* sine_wave, unsigned int
   float time = sine_wave->SampleTime*discrete_time;
   float value = (sine_wave->Amplitude)*sinf(2.0f*M_PI*sine_wave->Frequency*time + sine_wave->Phase) + sine_wave->Mean;
   return value;
+}
+
+/**
+  * @brief  Rx Transfer completed callback.
+  * @param  huart UART handle.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart == &huart3)
+  {
+    char param = '\0';
+    int value;
+    if(sscanf((char*)UART_Cmd, "%c%d", &param, &value) == 2)
+    {
+      switch(param)
+      {
+      case 'A':
+      case 'a':
+        hsine.Amplitude = __SATURATION(value, 0, DAC_VOLTAGE_MAX/2);
+        break;
+      case 'm':
+      case 'M':
+        hsine.Mean = __SATURATION(value, 0, DAC_VOLTAGE_MAX);
+        break;
+      case 'f':
+      case 'F':
+        hsine.Frequency = __SATURATION(value, 1, 100);
+        break;
+      default:
+        break;
+      }
+    }
+    HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, strlen(UART_Cmd));
+  }
 }
 /* USER CODE END 0 */
 
@@ -125,6 +163,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_DAC_Start(&hdac, DAC_CHANNEL_1);
   HAL_TIM_Base_Start(&htim7);
+  HAL_UART_Receive_IT(&huart3, (uint8_t*)UART_Cmd, strlen(UART_Cmd));
   /* USER CODE END 2 */
 
   /* Infinite loop */
