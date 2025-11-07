@@ -1,14 +1,14 @@
 /**
   ******************************************************************************
-  * @file     : InfiniteImpulseResponseFilterTest.c.c
+  * @file     : PidControllerTest.c
   * @author   : AW    Adrian.Wojcik@put.poznan.pl
   * @version  : 1.0.0
   * @date     : Nov 6, 2025
-  * @brief    : Unit test for CMSIS DSP Biquad Cascade IIR filter function.
+  * @brief    : Unit test for CMSIS DSP PID controller function.
   *
-  *             This file defines and verifies Biquad Cascade IIR filter
-  *             computation based on CMSIS DSP library routines.
-  *             The test uses the CuTest framework for validation.
+  *             This file defines and verifies PID controller computation based
+  *             on CMSIS DSP library routines. The test uses the CuTest framework
+  *             for validation.
   *
   * @see      : https://arm-software.github.io/CMSIS-DSP/main/group__BiquadCascadeDF2T.html
   *
@@ -22,21 +22,21 @@
 #include "CuTest.h"
 #include "arm_math.h"
 
-#include "IIR1_biquad_df1.h"
-#include "X2_vec.h"
-#include "Y2_vec.h"
-#include "Y2_REF_vec.h"
+#include "PID1_pid.h"
+#include "X3_vec.h"
+#include "Y3_vec.h"
+#include "Y3_REF_vec.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define USE_SWV_IIR 0
+#define USE_SWV_PID 0
 
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-#if USE_SWV_IIR
-float32_t SWV_IIR1;
+#if USE_SWV_PID
+float32_t SWV_PID1;
 #endif
 
 /* Public variables ----------------------------------------------------------*/
@@ -55,30 +55,40 @@ float32_t RMSE(const float32_t* y, const float32_t* yref, const uint32_t len);
 
 /* Private functions ---------------------------------------------------------*/
 
-void Test_CMSIS_DSP_IIR(CuTest *tc)
+
+void Test_CMSIS_DSP_PID(CuTest *tc)
 {
-  // Initialize FIR filter instance
-  arm_biquad_cascade_df1_init_f32(&IIR1, IIR1_NUM_STAGES, IIR1_COEFFS, IIR1_STATE);
+  // Set PID controller gains
+  PID1.Kp = PID1_KP;
+  PID1.Ki = PID1_KI;
+  PID1.Kd = PID1_KD;
 
-  // Filter test signal sample by sample
-  for(uint32_t i = 0; i < X2_LEN; i++)
+  // Initialize PID controller instance */
+  /** This function computes the structure fields: A0, A1 A2
+   *  using the proportional gain (Kp), integral gain (Ki)
+   *  and derivative gain (Kd); also sets the state variables to zeros.
+   */
+  arm_pid_init_f32(&PID1, 1);
+
+  /* Generate control signal sample by sample */
+  for(uint32_t i = 0; i < X3_LEN; i++)
   {
-      arm_biquad_cascade_df1_f32(&IIR1, &X2[i], &Y2[i], IIR1_BLOCK_SIZE);
-#if USE_SWV_IIR
-      SWV_IIR1 = Y2[i];
-      HAL_Delay(0);
-#endif
-   }
+    Y3[i] = arm_pid_f32(&PID1, X3[i]);
+    #if USE_SWV_PID
+    SWV_PID1 = Y3[i];
+    HAL_Delay(0);
+    #endif
+  }
 
-  float32_t rmse = RMSE(Y2_REF, Y2, Y2_LEN);
+  float32_t rmse = RMSE(Y3_REF, Y3, Y3_LEN);
 
-  CuAssertDblEquals(tc, 0.0f, rmse, 1e-4f);
+  CuAssertDblEquals(tc, 0.0f, rmse, 1e-10f);
 }
 
 /* Public functions ----------------------------------------------------------*/
-CuSuite* CuGet_Test_CMSIS_DSP_IIR_Suite(void)
+CuSuite* CuGet_Test_CMSIS_DSP_PID_Suite(void)
 {
   CuSuite* suite = CuSuiteNew();
-  SUITE_ADD_TEST(suite, Test_CMSIS_DSP_IIR);
+  SUITE_ADD_TEST(suite, Test_CMSIS_DSP_PID);
   return suite;
 }
