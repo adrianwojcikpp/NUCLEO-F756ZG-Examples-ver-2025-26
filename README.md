@@ -54,20 +54,20 @@ Zadania laboratoryjne
   - [Zadanie #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/abeaaf30df224d4c8595e7febe835ca94c910061/L08_Example)
   - [Zadanie #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/46a8025ec5fb3cfea6580e98a5c4d8e57c5204d1/L08_Example)
   - [Zadanie #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/f3b485db67767849cda6da49f4052e86272bdfae/L08_Example)
-- L09: Układ sterowania
-  - [Zadanie zaliczeniowe]()
+- L09: Układ sterowania (TODO)
+  - Zadanie zaliczeniowe
 - L10: DSP cz. 1
   - [Zadanie #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/eee24b7e22804f8091451de5839c534f4371af42/L10_L11_Example) 
   - [Zadanie #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/a48f1895cf4e7c1e6fa38ba493d44ed8abba75df/L10_L11_Example)
   - [Zadanie #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/a120c8163c7b0b4ae3427a1a5c9006b77eef06ea/L10_L11_Example)
 - L11: DSP cz. 2
-  - [Zadanie #1]() 
-  - [Zadanie #2]()
-  - [Zadanie #3]()
+  - [Zadanie #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/172a1cf1e0059062af33d5d1aa6ed1fd0589f4bc/L10_L11_Example) 
+  - [Zadanie #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/ee36880705cc457651c63b208799d71c5f7e98df/L10_L11_Example)
+  - [Zadanie #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/f912513478743f7399012d4c721125da2228bc4c/L10_L11_Example)
 - L12: LCD
-  - [Zadanie dodatkowe #1]()
+  - Zadanie dodatkowe #1
 - L13: C#
-  - [Zadanie dodatkowe #2]()
+  - Zadanie dodatkowe #2
  
 # Examples of embedded applications for NUCLEO-F746ZG board
 
@@ -124,17 +124,17 @@ Project created using the STM32CubeIDE environment, version **1.19.0** and STM32
   - [Task #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/abeaaf30df224d4c8595e7febe835ca94c910061/L08_Example)
   - [Task #4](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/46a8025ec5fb3cfea6580e98a5c4d8e57c5204d1/L08_Example)
   - [Task #5](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/f3b485db67767849cda6da49f4052e86272bdfae/L08_Example)
-- L09: Control system
+- L09: Control system (TODO)
   - [Final task]()
 - L10: DSP cz. 1
   - [Task #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/eee24b7e22804f8091451de5839c534f4371af42/L10_L11_Example) 
   - [Task #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/a48f1895cf4e7c1e6fa38ba493d44ed8abba75df/L10_L11_Example)
   - [Task #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/a120c8163c7b0b4ae3427a1a5c9006b77eef06ea/L10_L11_Example)
 - L11: DSP cz. 2
-  - [Task #1]() 
-  - [Task #2]()
-  - [Task #3]()
-- L12: LCD
-  - [Extra credit task #1]()
-- L13: C#
-  - [Extra credit task #2]()
+  - [Task #1](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/172a1cf1e0059062af33d5d1aa6ed1fd0589f4bc/L10_L11_Example) 
+  - [Task #2](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/ee36880705cc457651c63b208799d71c5f7e98df/L10_L11_Example)
+  - [Task #3](https://github.com/adrianwojcikpp/NUCLEO-F756ZG-Examples-ver-2025-26/tree/f912513478743f7399012d4c721125da2228bc4c/L10_L11_Example)
+- L12: LCD (TODO)
+  - Extra credit task #1
+- L13: C# (TODO)
+  - Extra credit task #2
