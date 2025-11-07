@@ -18,17 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "i2c.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "arm_math.h"
-#include "aio.h"
-#include "ADC_LPF_fir.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,31 +45,20 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float POT1_RAW_mV, POT1_LPF_mV;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+#ifdef DEBUG
+void RunAllTests(void);
+#endif
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/**
-  * @brief  Regular conversion complete callback in non blocking mode
-  * @param  hadc pointer to a ADC_HandleTypeDef structure that contains
-  *         the configuration information for the specified ADC.
-  * @retval None
-  */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-  if(hadc == &hadc1)
-  {
-    POT1_RAW_mV = ADC_REG2VOLTAGE(HAL_ADC_GetValue(hadc));
-    arm_fir_f32(&ADC_LPF, &POT1_RAW_mV, &POT1_LPF_mV, 1);
-  }
-}
+
 /* USER CODE END 0 */
 
 /**
@@ -107,16 +92,10 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART3_UART_Init();
-  MX_TIM6_Init();
-  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  arm_fir_init_f32(&ADC_LPF, ADC_LPF_NUM_TAPS, ADC_LPF_COEFFS, ADC_LPF_STATE, ADC_LPF_BLOCK_SIZE);
-
-  //< @see: https://community.st.com/t5/stm32-mcus-products/adc-trigger-with-timer-not-working/td-p/267740
-  __HAL_RCC_DAC_CLK_ENABLE();
-
-  HAL_ADC_Start_IT(&hadc1);
-  HAL_TIM_Base_Start(&htim6);
+#ifdef DEBUG
+  RunAllTests();
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
