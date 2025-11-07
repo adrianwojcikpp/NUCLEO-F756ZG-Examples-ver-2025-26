@@ -60,3 +60,6 @@ L10_L11_Example/Components/Inc/C_REF_mat.h
 L10_L11_Example/Components/Inc/B_mat.h
 L10_L11_Example/Components/Inc/C_mat.h
 L10_L11_Example/Components/Inc/A_mat.h
+L10_L11_Example/Middlewares/Third_Party/ARM_CMSIS/Include/configDsp.cmake
+L10_L11_Example/Middlewares/Third_Party/ARM_CMSIS/Include/Makefile
+L10_L11_Example/Middlewares/Third_Party/ARM_CMSIS/Include/CMakeLists.txt
